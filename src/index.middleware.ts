@@ -28,7 +28,7 @@ const authMiddleware = (
 
     const decoded = jwt.verify(
       token,
-      config.jwt.secret
+      config.jwt.accessSecret
     );
 
     req.tokenHolder = decoded;

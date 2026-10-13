@@ -3,8 +3,15 @@ import { findByEmail, createUser } from './auth.repository.js';
 import { hashPassword, comparePassword } from '../../utils/passwordHash.js';
 import { HttpError } from '../../utils/httpError.js';
 import { config } from '../../config/index.js';
+import type { UserPublic } from './auth.interface.js';
 
-export const register = async (email: string, password: string) => {
+const toPublicUser = (user: { id: string; email: string; role: string }): UserPublic => ({
+  id: user.id,
+  email: user.email,
+  role: user.role,
+});
+
+export const register = async (email: string, password: string): Promise<UserPublic> => {
   const existingUser = await findByEmail(email);
 
   if (existingUser) {
@@ -19,8 +26,11 @@ export const register = async (email: string, password: string) => {
     role: 'user',
   });
 
-  return user;
-
+  return toPublicUser({
+    id: user.id,
+    email: user.email,
+    role: user.role,
+  });
 };
 
 export const login = async (email: string, password: string) => {
@@ -37,14 +47,14 @@ export const login = async (email: string, password: string) => {
   }
 
   const accessToken = jwt.sign(
-    { sub: email, role: user.role, type: 'access' },
-    config.jwt.secret,
+    { sub: user.email, role: user.role, type: 'access' },
+    config.jwt.accessSecret,
     { expiresIn: config.jwt.accessExpiresIn }
   );
 
   const refreshToken = jwt.sign(
-    { sub: email, role: user.role, type: 'refresh' },
-    config.jwt.secret,
+    { sub: user.email, role: user.role, type: 'refresh' },
+    config.jwt.refreshSecret,
     { expiresIn: config.jwt.refreshExpiresIn }
   );
 
@@ -53,7 +63,7 @@ export const login = async (email: string, password: string) => {
 
 export const refreshAccessToken = async (refreshToken: string) => {
   try {
-    const decoded = jwt.verify(refreshToken, config.jwt.secret);
+    const decoded = jwt.verify(refreshToken, config.jwt.refreshSecret);
 
     if (typeof decoded === 'string' || decoded.type !== 'refresh') {
       throw new HttpError(401, 'Invalid refresh token');
@@ -61,7 +71,7 @@ export const refreshAccessToken = async (refreshToken: string) => {
 
     const accessToken = jwt.sign(
       { sub: decoded.sub, role: decoded.role, type: 'access' },
-      config.jwt.secret,
+      config.jwt.accessSecret,
       { expiresIn: config.jwt.accessExpiresIn }
     );
 

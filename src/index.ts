@@ -1,4 +1,5 @@
 import express, { type Express, type Request, type Response } from 'express';
+import { specs, swaggerUi } from './config/swagger.js';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import { errorHandler } from './utils/httpError.js';
@@ -7,8 +8,9 @@ import authRoutes from './modules/auth/auth.routes.js';
 
 const app: Express = express();
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.use(cors({
-  origin: 'http://localhost:4200'
+  origin: config.corsOrigins
 }));
 app.use(express.json());
 
@@ -23,7 +25,7 @@ const port = config.port;
 
 mongoose.connect(config.database.url)
   .then(() => {
-    console.log('MongoDB connected');
+    console.log(`MongoDB connected [env=${config.env}]`);
 
     app.listen(port, () => {
       console.log(`Example app listening on port ${port}`);

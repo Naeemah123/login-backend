@@ -1,16 +1,17 @@
 import type { Request, Response, NextFunction } from 'express';
-/** Operational HTTP error with status code. */
+
 export class HttpError extends Error {
   status: number;
+  errors: string[];
 
-  constructor(status: number, message: string) {
+  constructor(status: number, message: string, errors: string[] = []) {
     super(message);
     this.status = status;
+    this.errors = errors;
     this.name = 'HttpError';
   }
 }
 
-/** Wrap async route handlers — no try/catch boilerplate in controllers. */
 export const asyncHandler = (
   fn: (req: Request, res: Response, next: NextFunction) => Promise<any>
 ) => {
@@ -25,17 +26,20 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
+  console.error('[API ERROR]', error);
   const status = error instanceof HttpError ? error.status : 500;
 
   const message =
     error instanceof Error ? error.message : 'Internal server error';
+
+  const errors = error instanceof HttpError ? error.errors : [];
 
   res.status(status).json({
     response: {
       status: 'FAILED',
       message,
       code: status,
-      errors: [],
+      errors,
     },
     data: {},
   });
