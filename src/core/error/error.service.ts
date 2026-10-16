@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from 'express';
+import { sendError } from '../app.util.js';
 
 export class Exception extends Error {
   status: number;
@@ -18,7 +19,7 @@ export class Exception extends Error {
 
 export const errorHandler = (
   error: unknown,
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction,
 ) => {
@@ -29,13 +30,5 @@ export const errorHandler = (
     error instanceof Exception ? error.message : 'Internal server error';
   const errors = error instanceof Exception ? error.errors : {};
 
-  res.status(status).json({
-    response: {
-      status: 'FAILED',
-      message,
-      code: status,
-      errors,
-    },
-    data: {},
-  });
+  return sendError(req, res, { message, statusCode: status, errors });
 };

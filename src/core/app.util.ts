@@ -6,6 +6,28 @@ interface SendOptions {
   statusCode?: number;
 }
 
+interface SendErrorOptions {
+  message: string;
+  statusCode?: number;
+  errors?: Record<string, string[]>;
+}
+
+function buildEnvelope(
+  status: 'SUCCESS' | 'FAILED',
+  message: string,
+  code: number,
+  errors: unknown,
+) {
+  return {
+    response: {
+      status,
+      message,
+      code,
+      errors,
+    },
+  };
+}
+
 export function send(
   req: Request,
   res: Response,
@@ -31,13 +53,19 @@ export function send(
     return res.status(statusCode).end();
   }
   return res.status(statusCode).json({
-    response: {
-      status: 'SUCCESS',
-      message,
-      code: statusCode,
-      errors: [],
-    },
+    ...buildEnvelope('SUCCESS', message, statusCode, []),
     data: cleanData,
+  });
+}
+
+export function sendError(
+  _req: Request,
+  res: Response,
+  { message, statusCode = 500, errors = {} }: SendErrorOptions,
+) {
+  return res.status(statusCode).json({
+    ...buildEnvelope('FAILED', message, statusCode, errors),
+    data: {},
   });
 }
 

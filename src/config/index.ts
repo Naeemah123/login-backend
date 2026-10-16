@@ -1,6 +1,7 @@
 import path from 'node:path';
 import dotenv from 'dotenv';
 import type { SignOptions } from 'jsonwebtoken';
+import { Exception } from '../core/error/error.service.js';
 
 const allowedEnvironments = [
   'local',
@@ -14,7 +15,7 @@ type Environment = (typeof allowedEnvironments)[number];
 const rawEnv = process.env.NODE_ENV || 'local';
 
 if (!allowedEnvironments.includes(rawEnv as Environment)) {
-  throw new Error(`Invalid NODE_ENV: ${rawEnv}`);
+  throw new Exception(500, `Invalid NODE_ENV: ${rawEnv}`);
 }
 
 const nodeEnv = rawEnv as Environment;

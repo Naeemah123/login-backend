@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { validator } from './validator.service.js';
+import { Exception } from '../error/error.service.js';
 
 type DtoClass<T extends object> = new () => T;
 
@@ -16,7 +17,7 @@ export function ValidateBody<T extends object>(dtoClass: DtoClass<T>) {
     ) => unknown;
 
     if (typeof originalMethod !== 'function') {
-      throw new Error('ValidateBody can only decorate a method');
+      throw new Exception(500, 'ValidateBody can only decorate a method');
     }
 
     descriptor.value = async function (
