@@ -1,23 +1,26 @@
-import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import { IsEmail, IsString, IsNotEmpty, MinLength } from 'class-validator';
 
-export class LoginDto {
+export class AuthLoginBodyDto {
   @IsEmail()
   email!: string;
 
+  @IsString()
   @IsNotEmpty()
   password!: string;
 }
 
-export class RegisterDto {
+export class AuthRegisterBodyDto {
   @IsEmail()
   email!: string;
 
+  @IsString()
   @IsNotEmpty()
   @MinLength(6, { message: 'Password must be at least 6 characters long' })
   password!: string;
 }
 
-export class RefreshTokenDto {
+export class AuthRefreshTokenBodyDto {
+  @IsString()
   @IsNotEmpty()
   refreshToken!: string;
 }

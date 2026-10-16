@@ -1,4 +1,3 @@
-
 export interface UserPublic {
   id: string;
   email: string;
@@ -10,12 +9,13 @@ export interface AuthTokens {
   refreshToken: string;
 }
 
-export type TokenType = 'access' | 'refresh';
+export type TokenType = 'access' | 'refresh' | 'reset';
 
 export interface AuthPayload {
   sub: string;
   role: string;
   type: TokenType;
+  userAgent?: string;
   iat?: number;
   exp?: number;
 }

@@ -1,9 +1,9 @@
-import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
-import * as controller from './auth.controller.js';
-import auth from '../../index.middleware.js';
+import { authController } from './auth.controller.js';
+import auth from '../../core/middleware/index.middleware.js';
+import { AppRouter } from '../../core/router/app-router.js';
 
-const router = Router();
+const appRouter = new AppRouter();
 
 const authLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -21,9 +21,9 @@ const authLimiter = rateLimit({
   },
 });
 
-router.post('/register', authLimiter, controller.register);
-router.post('/login', authLimiter, controller.login);
-router.post('/refresh', controller.refresh);
-router.get('/dashboard', auth, controller.dashboard);
+appRouter.post('/register', authLimiter, authController.register);
+appRouter.post('/login', authLimiter, authController.login);
+appRouter.post('/refresh', authLimiter, authController.refresh);
+appRouter.get('/dashboard', auth, authController.dashboard);
 
-export default router;
+export default appRouter.router;

@@ -8,14 +8,22 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: 6
+    minlength: 6,
   },
   role: {
     type: String,
     required: true,
     default: 'user',
   },
+  isDelete: {
+    type: Boolean,
+    default: false,
+  },
+  isSuspend: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model('User', userSchema);
 export default User;

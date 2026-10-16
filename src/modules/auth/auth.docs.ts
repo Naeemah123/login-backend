@@ -1,4 +1,3 @@
-
 /**
  * @openapi
  * tags:
@@ -26,12 +25,20 @@
  *             code:
  *               type: integer
  *             errors:
- *               type: array
- *               items:
- *                 type: string
+ *               oneOf:
+ *                 - type: array
+ *                   items:
+ *                     type: string
+ *                 - type: object
+ *                   additionalProperties:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *               example: []
  *         data:
  *           type: object
  *           additionalProperties: true
+ *
  *     PublicUser:
  *       type: object
  *       required: [id, email, role]
@@ -44,6 +51,7 @@
  *         role:
  *           type: string
  *           example: user
+ *
  *     AuthTokens:
  *       type: object
  *       required: [accessToken, refreshToken]
@@ -54,6 +62,7 @@
  *         refreshToken:
  *           type: string
  *           description: JWT signed with the refresh secret
+ *
  *     ErrorResponse:
  *       type: object
  *       required: [response, data]
@@ -70,9 +79,16 @@
  *             code:
  *               type: integer
  *             errors:
- *               type: array
- *               items:
- *                 type: string
+ *               oneOf:
+ *                 - type: array
+ *                   items:
+ *                     type: string
+ *                 - type: object
+ *                   additionalProperties:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *               example: []
  *         data:
  *           type: object
  *           example: {}
@@ -185,6 +201,12 @@
  *               $ref: '#/components/schemas/ErrorResponse'
  *       '401':
  *         description: Invalid email or password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       '403':
+ *         description: Account is locked, suspended, or inactive
  *         content:
  *           application/json:
  *             schema:
